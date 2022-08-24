@@ -29,7 +29,6 @@ struct Body {
 }
 
 fn main() {
-    let (tx, rx) = std::sync::mpsc::channel();
     let rt = Runtime::new().expect("Unable to create Runtime");
 
     // Enter the runtime so that `tokio::spawn` is available immediately.
@@ -49,12 +48,14 @@ fn main() {
     eframe::run_native(
         "Hello egui + tokio",
         eframe::NativeOptions::default(),
-        Box::new(|_cc| Box::new(MyApp::new(tx, rx))),
+        Box::new(|_cc| Box::new(MyApp::default())),
     );
 }
 
-impl MyApp {
-    fn new(tx: Sender<u32>, rx: Receiver<u32>) -> Self {
+impl Default for MyApp {
+    fn default() -> Self {
+        let (tx, rx) = std::sync::mpsc::channel();
+
         Self {
             tx,
             rx,
