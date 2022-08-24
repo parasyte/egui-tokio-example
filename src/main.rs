@@ -4,13 +4,13 @@
 use eframe::egui;
 use reqwest::Client;
 use serde_derive::{Deserialize, Serialize};
-use std::sync::mpsc::{Receiver, SyncSender};
+use std::sync::mpsc::{Receiver, Sender};
 use std::time::Duration;
 use tokio::runtime::Runtime;
 
 struct MyApp {
     // Sender/Receiver for async notifications.
-    tx: SyncSender<u32>,
+    tx: Sender<u32>,
     rx: Receiver<u32>,
 
     // Silly app state.
@@ -29,7 +29,7 @@ struct Body {
 }
 
 fn main() {
-    let (tx, rx) = std::sync::mpsc::sync_channel(10);
+    let (tx, rx) = std::sync::mpsc::channel();
     let rt = Runtime::new().expect("Unable to create Runtime");
 
     // Enter the runtime so that `tokio::spawn` is available immediately.
@@ -54,7 +54,7 @@ fn main() {
 }
 
 impl MyApp {
-    fn new(tx: SyncSender<u32>, rx: Receiver<u32>) -> Self {
+    fn new(tx: Sender<u32>, rx: Receiver<u32>) -> Self {
         Self {
             tx,
             rx,
@@ -83,7 +83,7 @@ impl eframe::App for MyApp {
     }
 }
 
-fn send_req(incr: u32, tx: SyncSender<u32>, ctx: egui::Context) {
+fn send_req(incr: u32, tx: Sender<u32>, ctx: egui::Context) {
     tokio::spawn(async move {
         // Send a request with an increment value.
         let body: HttpbinJson = Client::default()
