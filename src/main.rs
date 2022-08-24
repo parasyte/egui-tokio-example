@@ -32,11 +32,11 @@ fn main() {
     let (tx, rx) = std::sync::mpsc::sync_channel(10);
     let rt = Runtime::new().expect("Unable to create Runtime");
 
-    // Enter the runtime so that `tokio::spawn` is available immediately
+    // Enter the runtime so that `tokio::spawn` is available immediately.
     let _enter = rt.enter();
 
     // Execute the runtime in its own thread.
-    // The future doesn't have to do anything. In this example, it just sleeps forever
+    // The future doesn't have to do anything. In this example, it just sleeps forever.
     std::thread::spawn(move || {
         rt.block_on(async {
             loop {
@@ -46,10 +46,9 @@ fn main() {
     });
 
     // Run the GUI in the main thread.
-    let options = eframe::NativeOptions::default();
     eframe::run_native(
         "Hello egui + tokio",
-        options,
+        eframe::NativeOptions::default(),
         Box::new(|_cc| Box::new(MyApp::new(tx, rx))),
     );
 }
